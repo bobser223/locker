@@ -198,9 +198,6 @@ static int statistics_three_digit(const std::string& hostess_position, three_dig
       if (add_3_digit_key_to_statistic(curr_stat, key)){
         std::cout << "This is not a three digit key: " << key << " , call another func\n";
       }
-
-    return 0;
-
   }
 
 
