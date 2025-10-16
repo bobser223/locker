@@ -62,15 +62,13 @@ struct three_digit_statistics{
 
 };
 
-// КУДИ ПИСАТИ ФАЙЛИ:
-// спершу пробуємо спільну теку Documents, інакше просто в домашню
+
 static std::string base_dir() {
   const char* home = std::getenv("HOME");
   std::string h = home ? home : "";
   std::string d1 = h + "/storage/shared/Documents/locker_numbers";
   std::string d2 = h + "/storage/shared/locker_numbers";
-  // Не створюємо тут теку через <filesystem>, а покладаємося на крок 2)
-  // Вибираємо те, що існує, або d1 за замовчуванням
+
   std::ifstream t1(d1 + "/.probe"); bool docs = !!t1;
   return docs ? d1 : d2;
 }
@@ -136,16 +134,11 @@ static void print_distribution(const std::map<std::uint64_t, std::uint64_t>& cou
     }
 }
 
-static std::map<std::uint64_t, std::uint64_t> get_frequency_map(const std::vector<std::uint64_t>& numbers){
-    std::map<std::uint64_t, std::uint64_t> frequency_map;
-    for(auto num:numbers){
-        if (frequency_map.find(num) != frequency_map.end())
-            frequency_map[num]++;
-        else
-            frequency_map[num] = 0;
-    }
-
-    return frequency_map;
+static std::map<std::uint64_t, std::uint64_t>
+get_frequency_map(const std::vector<std::uint64_t>& numbers) {
+  std::map<std::uint64_t, std::uint64_t> frequency_map;
+  for (auto num : numbers) frequency_map[num]++;
+  return frequency_map;
 }
 
 static void add(std::uint64_t key_number, const std::string& hostess_position) {
@@ -216,27 +209,29 @@ static int statistics_three_digit(const std::string& hostess_position, three_dig
 }
 
 static void statistics_three_digit(const std::string& hostess_position){
-  if (hostess_position == "all"){
-    three_digit_statistics all;
+  three_digit_statistics curr_stat;
+  statistics_three_digit(hostess_position, curr_stat);
 
-      statistics_three_digit(hostess_position, all);
+  std::map<std::uint64_t, std::uint64_t> dist_first;
+  std::map<std::uint64_t, std::uint64_t> dist_second;
+  std::map<std::uint64_t, std::uint64_t> dist_third;
 
-
-    std::cout << "Through all positions the most popular \n"
-                 "third digit is " << static_cast<int>(all.most_popular_third()) << "\n" <<
-              "second digit is " << static_cast<int>(all.most_popular_second()) << "\n" <<
-              "first digit is " << static_cast<int>(all.most_popular_first()) << "\n";
-  } else {
-    three_digit_statistics curr_stat;
-    statistics_three_digit(hostess_position, curr_stat);
-    std::cout << "For position "<< hostess_position <<" the most popular \n"
-                 "third digit is " << static_cast<int>(curr_stat.most_popular_third()) << "\n" <<
-              "second digit is " << static_cast<int>(curr_stat.most_popular_second()) << "\n" <<
-              "first digit is " << static_cast<int>(curr_stat.most_popular_first()) << "\n";
+  for (uint8_t i = 0; i < 10; i++){
+    dist_first[i] = curr_stat.first[i];
+    dist_second[i] = curr_stat.second[i];
+    dist_third[i] = curr_stat.third[i];
   }
 
+  std::cout << "\n=== Distribution for position: " << hostess_position << " ===\n";
 
+  print_distribution(dist_third, "Hundreds digit");
+  print_distribution(dist_second, "Tens digit");
+  print_distribution(dist_first, "Ones digit");
 
+  std::cout << "\nMost popular digits:\n";
+  std::cout << "  Hundreds: " << static_cast<int>(curr_stat.most_popular_third()) << "\n";
+  std::cout << "  Tens:     " << static_cast<int>(curr_stat.most_popular_second()) << "\n";
+  std::cout << "  Ones:     " << static_cast<int>(curr_stat.most_popular_first()) << "\n";
 }
 
 
